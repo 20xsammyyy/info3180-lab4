@@ -42,6 +42,26 @@ def upload():
 
     return render_template('upload.html',form=file)
 
+def get_uploaded_image():
+    uploads_dir = os.path.join(app.config['UPLOAD_FOLDER'])
+    uploaded_images = [f for f in os.listdir(uploads_dir) if os.path.isfile(os.path.join(uploads_dir, f))]
+    return uploaded_images
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route("/files")
+@login_required
+def files():
+    photos= get_uploaded_image()
+    return render_template('files.html', photos=photos)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('Loggout successful', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
